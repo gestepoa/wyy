@@ -80,7 +80,7 @@ def get_comment_back(id):
         result1 = bs4function(page)
         total_result = total_result + result1
     driver.quit()
-    
+
     # 另存为EXCEL
     total_result = pd.DataFrame(total_result)
     total_result.to_csv("wyy_comm_data_back_" + str(id) + ".csv", index_label="index_label", encoding='utf-8-sig')
