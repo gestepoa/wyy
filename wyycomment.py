@@ -38,16 +38,17 @@ def get_comment_back(id):
     else:
         page_num = int(int(comm_num.text)/20)+1
     print(page_num)
-    # 跳转到最后一页
     input_search = driver.find_element(By.LINK_TEXT, str(page_num))
     driver.execute_script("arguments[0].click();", input_search)
     time.sleep(5)
+
     # 读取最后一页内容并写入total_result
     page = driver.page_source
     result = bs4function(page)
     total_result = total_result + result
+
+    # 跳转到上一页后获取页面内容，并循环执行
     for i in range(1, page_num):
-        # 循环开始，跳转到上一页后获取页面内容
         print('开始加载第%d页' % (page_num-i))
         input_search = driver.find_element(By.LINK_TEXT, "上一页")
         driver.execute_script("arguments[0].click();", input_search)
@@ -56,6 +57,7 @@ def get_comment_back(id):
         result1 = bs4function(page)
         total_result = total_result + result1
     driver.quit()
+
     # 另存为EXCEL
     total_result = pd.DataFrame(total_result)
     total_result.to_csv("wyy_comm_data_back_" + str(id) + ".csv", index_label="index_label", encoding='utf-8-sig')
