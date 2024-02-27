@@ -9,6 +9,32 @@ from bs4 import BeautifulSoup
 import pandas as pd
 
 
+# def get_comment_front(id):
+#     total_result = []
+#     url = 'https://music.163.com/#/song?id=' + str(id)
+#     driver = webdriver.Chrome()
+#     driver.get(url)
+#     driver.switch_to.frame('g_iframe')
+#     comm_num = driver.find_element_by_css_selector('#comment-box > div > div > span > span')
+#     page_num = int(int(comm_num.text)/20)+1
+#     print(page_num)
+#     page = driver.page_source
+#     result = bs4function(page)
+#     total_result = total_result + result
+#     for i in range(1, 20):
+#         print('开始加载第%d页' % (i+1))
+#         input_search = driver.find_element_by_link_text('下一页')
+#         driver.execute_script("arguments[0].click();", input_search)
+#         time.sleep(5)
+#         page = driver.page_source
+#         result1 = bs4function(page)
+#         total_result = total_result + result1
+#     driver.quit()
+#     total_result = pd.DataFrame(total_result)
+#     total_result.to_csv("comm_data_front.csv", index_label="index_label", encoding='utf-8-sig')
+#     print('success')
+
+
 def get_comment_back(id):
     total_result = []
     url = 'https://music.163.com/#/song?id=' + str(id)
@@ -30,25 +56,20 @@ def get_comment_back(id):
     wait = WebDriverWait(driver, 20)
     wait.until(EC.frame_to_be_available_and_switch_to_it(driver.find_element(By.ID, "g_iframe")))
     # driver.switch_to.frame('g_iframe')
-
-    # 获取总评论数及总页数
+    # page_num为评论总页数
     comm_num = driver.find_element(By.CSS_SELECTOR, '#comment-box > div > div > span > span')
-    if (int(comm_num.text)/20) % 1 == 0:
-        page_num = int(int(comm_num.text)/20)
-    else:
-        page_num = int(int(comm_num.text)/20)+1
+    page_num = int(int(comm_num.text)/20)+1
     print(page_num)
+    # 跳转到最后一页
     input_search = driver.find_element(By.LINK_TEXT, str(page_num))
     driver.execute_script("arguments[0].click();", input_search)
     time.sleep(5)
-
     # 读取最后一页内容并写入total_result
     page = driver.page_source
     result = bs4function(page)
     total_result = total_result + result
-
-    # 跳转到上一页后获取页面内容，并循环执行
     for i in range(1, page_num):
+        # 循环开始，跳转到上一页后获取页面内容
         print('开始加载第%d页' % (page_num-i))
         input_search = driver.find_element(By.LINK_TEXT, "上一页")
         driver.execute_script("arguments[0].click();", input_search)
@@ -57,7 +78,6 @@ def get_comment_back(id):
         result1 = bs4function(page)
         total_result = total_result + result1
     driver.quit()
-
     # 另存为EXCEL
     total_result = pd.DataFrame(total_result)
     total_result.to_csv("wyy_comm_data_back_" + str(id) + ".csv", index_label="index_label", encoding='utf-8-sig')
@@ -177,31 +197,19 @@ def get_json(url, header):
         return None
 
 
-def getSongsId(albumInfo):
-    songsList = []
-    if albumInfo['code'] == 200:
-        count = len(albumInfo["songs"])
-        for i in range(0, count):
-            songsList.append(albumInfo['songs'][i]['id'])
-        return songsList
-    else:
-        print("error")
-        return songsList
-
-
 if __name__ == '__main__':
+    # ua = UserAgent()
+    # headers = {'User-Agent': ua.random}
 
-    mode = int(input('enter mode type(1 for single/2 for album):'))
-    id = int(input('enter id:'))
-    if mode == 1:
-        get_comment_back(id)
-    elif mode == 2:
-        ua = UserAgent()
-        header = {'User-Agent': ua.random}
-        url = 'https://api.obfs.dev/api/netease/album?id=' + str(id)
-        result = get_json(url, header)
-        song_list = getSongsId(result)
-        for i in range(1, len(song_list)+1):
-            get_comment_back(str(song_list[i-1]))
-    else:
-        print('mode error')
+    # song_id = input('enter song id：')
+    # mode = int(input('enter mode type(1 for web/2 for api):'))
+    # if mode == 1:
+    #     # get_comment_front(song_id)
+    #     get_comment_back(song_id)
+    # elif mode == 2:
+    #     get_comment(song_id)
+    # else:
+    #     print('mode error')
+    song_list = [1456445962]
+    for i in range(1, len(song_list)+1):
+        get_comment_back(str(song_list[i-1]))
