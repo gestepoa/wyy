@@ -88,7 +88,7 @@ def bs4function(page):
     ua = UserAgent()
     header = {'User-Agent': ua.random}
     result = []
-    bs = BeautifulSoup(page, "lxml")
+    bs = BeautifulSoup(page, "html.parser")
     a = bs.find_all('div', class_='itm')
     n = len(a)
     for j in range(1, n+1):
@@ -210,6 +210,6 @@ if __name__ == '__main__':
     #     get_comment(song_id)
     # else:
     #     print('mode error')
-    song_list = [1456445962]
+    song_list = [1807796555]
     for i in range(1, len(song_list)+1):
         get_comment_back(str(song_list[i-1]))
